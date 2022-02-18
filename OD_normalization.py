@@ -33,8 +33,8 @@ def run(protocol):
     tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
     tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 4)
 
-    wellplate_0 = protocol.load_labware('nest_96_wellplate_200ul_flat', 2)
-    wellplate_1 = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
+    wellplate_0 = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
+    wellplate_1 = protocol.load_labware('corning_96_wellplate_360ul_flat', 3)
 
     l_pip = protocol.load_instrument('p300_single_gen2', 'left', [tiprack_1, tiprack_2])
 
