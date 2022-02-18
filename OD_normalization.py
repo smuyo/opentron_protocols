@@ -27,14 +27,14 @@ def calculate_OD(initial_OD, final_OD, final_volume):
     return culture_OD, media_OD
 
 def run(protocol):
-    reservoir = protocol.load_labware('agilent_1_reservoir_290ml', 5)
+    reservoir = protocol.load_labware('opentrons_6_tuberack_falcon_50ml_conical', 5)
     source = reservoir.wells()[0]
 
-    tiprack_1 = protocol.load_labware('opentrons_96_filtertiprack_200ul', 1)
-    tiprack_2 = protocol.load_labware('opentrons_96_filtertiprack_200ul', 4)
+    tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+    tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 4)
 
-    wellplate_0 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 2)
-    wellplate_1 = protocol.load_labware('biorad_96_wellplate_200ul_pcr', 3)
+    wellplate_0 = protocol.load_labware('nest_96_wellplate_200ul_flat', 2)
+    wellplate_1 = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
 
     l_pip = protocol.load_instrument('p300_single_gen2', 'left', [tiprack_1, tiprack_2])
 
