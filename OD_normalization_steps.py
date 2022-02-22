@@ -1,11 +1,13 @@
+import copy
+
 od_csv = [[0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15],
-[1.286,1.23,1.18,1.085,1.025,0.957,0.858,0.698,0.547,0.323,0.088,0.088],
-[0.089,0.088,0.089,0.087,0.089,0.09,0.09,0.089,0.088,0.087,0.087,0.087],
-[0.09,0.087,0.088,0.089,0.089,0.091,0.091,0.091,0.089,0.088,0.087,0.088],
-[0.088,0.089,0.087,0.089,0.089,0.089,0.09,0.089,0.088,0.088,0.087,0.089],
-[0.088,0.089,0.091,0.092,0.088,0.09,0.089,0.088,0.089,0.087,0.09,0.088],
-[0.089,0.082,0.089,0.088,0.088,0.089,0.089,0.089,0.089,0.088,0.09,0.09],
-[0.088,0.083,0.089,0.089,0.087,0.088,0.09,0.087,0.087,0.089,0.09,0.09]]
+[0.91,0.893,0.86,0.724,0.699,0.69,0.566,0.469,0.349,0.196,0.096,0.091],
+[0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15],
+[0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15],
+[0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15],
+[0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15],
+[0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15],
+[0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15,0.15]]
 target_od = 0.15
 top_od = 0.2
 initial_volume = 150
@@ -55,16 +57,21 @@ def calculate_OD(initial_OD, final_OD, final_volume, start_volume, max_intermedi
                     out_vols.append(volume)
     return out_vols
 
+def custom_mix(times, pipette, location, volums):
+    for i in range(times):
+        pipette.aspirate(volums, location)
+        pipette.dispense(volums, location, rate=3.33)
+
 def run(protocol):
     reservoir = protocol.load_labware('opentrons_6_tuberack_falcon_50ml_conical', 6)
     source = reservoir.wells()[0].top(z=-36)
     tr_tube = reservoir.wells()[5].top(z=-14)
 
-    tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
+    tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
     tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 5)
     tiprack_3 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
 
-    wellplate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
+    wellplate = protocol.load_labware('corning_96_wellplate_360ul_flat', 3)
 
     l_pip = protocol.load_instrument('p300_single', 'left', [tiprack_1, tiprack_2, tiprack_3])
 
@@ -99,4 +106,21 @@ def run(protocol):
 
     mix_volume = round(target_volume / 3)
 
-    l_pip.transfer(vols_transfer, source_dirs, dest_dirs, new_tip='always', mix_before=(3,mix_volume,rate=2.0))
+    for instru in range(len(vols_transfer)):
+        curr_vol = vols_transfer[instru]
+        curr_source = source_dirs[instru]
+        curr_dest = dest_dirs[instru]
+        if past_dest != curr_source:
+            if l_pip.has_tip:
+                l_pip.drop_tip()
+        if curr_source == source:
+            if not l_pip.has_tip:
+                l_pip.pick_up_tip()
+            l_pip.transfer(curr_vol, curr_source, curr_dest, new_tip='never')
+        else:
+            if not l_pip.has_tip:
+                l_pip.pick_up_tip()
+            custom_mix(5, l_pip, curr_source, 100)
+            l_pip.transfer(curr_vol, curr_source, curr_dest, new_tip='never')
+            l_pip.drop_tip()
+        past_dest = copy.deepcopy(curr_dest)
