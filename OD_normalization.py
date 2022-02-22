@@ -1,11 +1,11 @@
-od_csv = [[0.36,0.87,1,0.3,0.66,1,0.15,1,0.76,0.4,0.95,0.8],
-    [0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7],
-    [0.75,0.8,0.85,0.9,0.95,1,0.15,1,0.76,0.4,0.95,0.8],
-    [0.36,0.87,1,0.3,0.66,1,0.15,1,0.76,0.4,0.95,0.8],
-    [0.36,0.87,1,0.3,0.66,1,0.15,1,0.76,0.4,0.95,0.8],
-    [0.36,0.87,1,0.3,0.66,1,0.15,1,0.76,0.4,0.95,0.8],
-    [0.36,0.87,1,0.3,0.66,1,0.15,1,0.76,0.4,0.95,0.8],
-    [0.36,0.87,1,0.3,0.66,1,0.15,1,0.76,0.4,0.95,0.8]]
+od_csv = [[1.357,1.29,1.223,1.135,1.052,0.956,0.863,0.715,0.538,0.333,0.086,0.087],
+[1.286,1.23,1.18,1.085,1.025,0.957,0.858,0.698,0.547,0.323,0.088,0.088],
+[0.089,0.088,0.089,0.087,0.089,0.09,0.09,0.089,0.088,0.087,0.087,0.087],
+[0.09,0.087,0.088,0.089,0.089,0.091,0.091,0.091,0.089,0.088,0.087,0.088],
+[0.088,0.089,0.087,0.089,0.089,0.089,0.09,0.089,0.088,0.088,0.087,0.089],
+[0.088,0.089,0.091,0.092,0.088,0.09,0.089,0.088,0.089,0.087,0.09,0.088],
+[0.089,0.082,0.089,0.088,0.088,0.089,0.089,0.089,0.089,0.088,0.09,0.09],
+[0.088,0.083,0.089,0.089,0.087,0.088,0.09,0.087,0.087,0.089,0.09,0.09]]
 target_od = 0.15
 top_od = 0.2
 initial_volume = 150
@@ -21,22 +21,23 @@ metadata = {
 
 def calculate_OD(initial_OD, final_OD, final_volume, start_volume, max_intermediate, max_od):
     out_vols = []
-
     subpart = round((final_OD * final_volume) / initial_OD)
     aspir_vol = start_volume - subpart
-
-    if aspir_vol == 0:
+    if aspir_vol <= 0:
         return out_vols
-
     if aspir_vol <= start_volume - 50:
         out_vols.append(aspir_vol)
-        out_vols.append(aspir_vol)
-
+        if start_volume > final_volume:
+            aspir_vol2 = final_volume - (start_volume - aspir_vol)
+        elif start_volume == final_volume:
+            aspir_vol2 = aspir_vol
+        else:
+            aspir_vol2 = final_volume - (start_volume - aspir_vol)
+        out_vols.append(aspir_vol2)
     else:
         first_aspir = start_volume - 50
         out_vols.append(first_aspir)
         volume_need = round((50 * initial_OD) / final_OD)
-
         if volume_need <= max_intermediate:
             media_vol = volume_need - 50
             out_vols.append(media_vol)
