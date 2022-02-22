@@ -27,7 +27,7 @@ def calculate_OD(initial_OD, final_OD, final_volume, start_volume, max_intermedi
 
     if aspir_vol == 0:
         return out_vols
-    
+
     if aspir_vol <= start_volume - 50:
         out_vols.append(aspir_vol)
         out_vols.append(aspir_vol)
@@ -59,14 +59,13 @@ def run(protocol):
     source = reservoir.wells()[0].top(z=-36)
     tr_tube = reservoir.wells()[5].top(z=-14)
 
-    tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
-    tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 4)
-    tiprack_3 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
-    tiprack_4 = protocol.load_labware('opentrons_96_tiprack_300ul', 5)
+    tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
+    tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 5)
+    tiprack_3 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
 
     wellplate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
 
-    l_pip = protocol.load_instrument('p300_single', 'left', [tiprack_1, tiprack_2, tiprack_3, tiprack_4])
+    l_pip = protocol.load_instrument('p300_single', 'left', [tiprack_1, tiprack_2, tiprack_3])
 
     source_dirs = []
     dest_dirs = []
@@ -84,6 +83,8 @@ def run(protocol):
             max_vol += 5000
             source = reservoir.wells()[0].top(z=z_pos)
         for col_num in range(len(od_csv[row_num])):
+            if od_csv[row_num][col_num] <= target_od:
+                continue
             volumes = calculate_OD(od_csv[row_num][col_num], target_od, target_volume, initial_volume, vol_well, top_od)
             for vol_num in range(len(volumes)):
                 used_vol += volumes[vol_num]
