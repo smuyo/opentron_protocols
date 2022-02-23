@@ -127,3 +127,5 @@ def run(protocol):
             l_pip.transfer(curr_vol, curr_source, curr_dest, new_tip='never')
             l_pip.drop_tip()
         past_dest = copy.deepcopy(curr_dest)
+    if l_pip.has_tip:
+        l_pip.drop_tip()
